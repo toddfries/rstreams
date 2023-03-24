@@ -1,0 +1,74 @@
+#!/bin/sh
+
+# Copyright (c) 2023 Todd T. Fries <todd@fries.net>
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+echo "renicing.."
+D=doas
+for cmd in doas sudo
+do
+	for p in /bin /usr/bin /usr/local/bin
+	do
+		if [ -x "$p/$cmd" ]; then
+			D="$p/$cmd"
+			break 2
+		fi
+	done
+done
+		
+$D renice -n -20 $(pgrep -u _x11) $$
+
+set -A streams $(< rstreams.list)
+set -A formats 95 300 95 95
+
+set -A ps -- "" # play stream
+set -A fs -- "" # format for stream "-f <format>"
+set -A of -- "" # offset
+
+if [ "$1" ]; then
+	j=0
+	for i in $@
+	do
+		if ! [ "${streams[$i]}" ]; then
+			echo "i=$i but streams[$i] not found"
+			exit 1
+		fi
+		ps[$j]="${streams[$i]}"
+		fs[$j]="${formats[$i]}"
+		of[$j]="$i"
+		let j=j+1
+	done
+else
+	i=0
+	while [ "${streams[$i]}" ]
+	do
+		ps[$i]="${streams[$i]}"
+		fs[$i]="${formats[$i]}"
+		of[$i]="$i"
+		let i=i+1
+		
+	done
+fi
+j=0
+while [ "${ps[$j]}" ]
+do
+	v=${ps[$j]}
+	f=${fs[$j]}
+	i=${of[$j]}
+	
+	printf "%02d. %s\n" "$i" "$v"
+	xterm -e sh -c "yt-dlp -q --buffer-size 128K -o - $v | ffplay -x 640 -y 360 -" &
+	# -f $f
+	let j=j+1
+done
