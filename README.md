@@ -27,3 +27,6 @@ rstream 2
 ```
 
 will launch the 3rd video as counting starts at 0.
+
+The result can look like this (presuming you use cwm):
+![2x2 streaming windows](https://pbs.twimg.com/media/FquE8r0WAAE9dOZ?format=jpg&name=large)
