@@ -13,7 +13,7 @@ show output from essentially 'yt-dlp -o - | ffplay -'.
 Interacting with ffplay then permits:
 ```
 - resized/relocate as desired
-- 'm'          : muted
+- 'm'          : mute toggle
 - 'up arrow'   : speed up video to catch up to realtime
 - 'right arrow': skip forward to catch up to realtime
 ```
