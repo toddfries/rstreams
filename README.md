@@ -16,6 +16,7 @@ Interacting with ffplay then permits:
 - 'm'          : mute toggle
 - 'up arrow'   : speed up video to catch up to realtime
 - 'right arrow': skip forward to catch up to realtime
+- 'f'          : toggle fullscreen
 ```
 amongst other keybindings of ffplay.
 
