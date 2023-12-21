@@ -15,6 +15,7 @@
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 list="rstreams.list"
+cookieprofile=""
 while [ "$1" ]
 do
 	case "$1" in
@@ -24,6 +25,10 @@ do
 		if [ -f "$newlist" ]; then
 			list="$newlist"
 		fi
+	;;
+	-c)
+		cookieprofile=$2
+		shift
 	;;
 	*)
 		break
@@ -78,6 +83,16 @@ else
 		
 	done
 fi
+cookiefile="$HOME/.cache/chromium/.cookies.profile.${cookieprofile}.txt"
+if [ "$cookieprofile" ]; then
+	yt-dlp --cookies $cookiefile --cookies-from-browser chromium:"Profile ${cookieprofile}"
+fi
+xtra=""
+
+# if exists and is not empty...
+if [ -f $cookiefile -a -s $cookiefile ]; then
+	xtra="--cookies $cookiefile"
+fi
 j=0
 while [ "${ps[$j]}" ]
 do
@@ -86,7 +101,7 @@ do
 	i=${of[$j]}
 	
 	printf "%02d. %s\n" "$i" "$v"
-	xterm -e sh -c "yt-dlp -q --buffer-size 128K -o - $v | ffplay -x 640 -y 360 -" &
+	xterm -e sh -c "yt-dlp $xtra -q --buffer-size 128K -o - $v | ffplay -x 640 -y 360 -" &
 	# -f $f
 	let j=j+1
 done
